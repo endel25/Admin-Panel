@@ -45,7 +45,10 @@ use App\Http\Controllers\form_layouts\HorizontalForm;
 use App\Http\Controllers\tables\Basic as TablesBasic;
 
 // Main Page Route
-Route::get('/', [Analytics::class, 'index'])->middleware('auth')->name('dashboard-analytics');
+Route::get('/', [Analytics::class, 'index'])
+  ->middleware('auth')
+  ->name('dashboard-analytics');
+
 // layout
 Route::get('/layouts/without-menu', [WithoutMenu::class, 'index'])->name('layouts-without-menu');
 Route::get('/layouts/without-navbar', [WithoutNavbar::class, 'index'])->name('layouts-without-navbar');
@@ -69,9 +72,8 @@ Route::get('/pages/misc-under-maintenance', [MiscUnderMaintenance::class, 'index
 );
 
 // authentication
-// Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
+Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
-Route::get('/login', [LoginBasic::class, 'index'])->name('auth-login-basic');
 Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('auth-reset-password-basic');
 
 // cards
@@ -119,3 +121,6 @@ Route::get('/tables/basic', [TablesBasic::class, 'index'])->name('tables-basic')
 //database
 Route::post('/register/store', [RegisterBasic::class, 'store'])->name('form-data-store');
 Route::post('/login/fetch', [LoginBasic::class, 'fetch'])->name('form-data-fetch');
+
+//destroy page
+Route::get('/destroy', [LoginBasic::class, 'delete'])->name('destroy');

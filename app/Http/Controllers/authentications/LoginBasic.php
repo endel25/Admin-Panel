@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class LoginBasic extends Controller
 {
@@ -23,7 +24,9 @@ class LoginBasic extends Controller
             auth()->login($user);
 
             // Redirect to the dashboard
-            return redirect()->route('dashboard-analytics');
+            // return redirect()->route('dashboard-analytics');
+            // return response()->json(['message' => 'Login Success', 'status' => 200]);
+            return view('content.dashboard.dashboards-analytics');
         } else {
             return back()->withErrors(['password' => 'Invalid credentials.']);
         }
@@ -35,5 +38,11 @@ class LoginBasic extends Controller
   public function index()
   {
     return view('content.authentications.auth-login-basic');
+  }
+
+  public function delete(){
+    Auth::logout();
+    return view('content.authentications.auth-login-basic');
+
   }
 }
