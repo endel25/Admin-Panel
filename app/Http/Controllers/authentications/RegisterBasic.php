@@ -5,6 +5,7 @@ namespace App\Http\Controllers\authentications;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterBasic extends Controller
 {
@@ -29,6 +30,13 @@ $admin->password = bcrypt($validated['password']); // Always hash passwords befo
 $admin->email = $validated['email'];
 $admin->save();
 
+// dd($admin);
+$email=$admin->email;
+$to=$email;
+$msg="Thank you for registration";
+$subject="Registration";
+Mail::to($to)->send(new \App\Mail\WelcomeMail($msg,$subject));
+
 return redirect()->route('auth-login-basic')->with('success', 'Registration successful. Please log in.');
 
 
@@ -39,4 +47,7 @@ public function index()
     return view('content.authentications.auth-register-basic');
 }
 
+// public function sendmail(){
+
+// }
 }

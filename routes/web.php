@@ -124,3 +124,6 @@ Route::post('/login/fetch', [LoginBasic::class, 'fetch'])->name('form-data-fetch
 
 //destroy page
 Route::get('/destroy', [LoginBasic::class, 'delete'])->name('destroy');
+
+//send mail
+// Route::get('/sendmail', [RegisterBasic::class, 'sendmail'])->name('sendmail');
