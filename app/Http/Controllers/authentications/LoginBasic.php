@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\TwoFactorMail;
 
 class LoginBasic extends Controller
 {
@@ -44,5 +45,24 @@ class LoginBasic extends Controller
     Auth::logout();
     return view('content.authentications.auth-login-basic');
 
+  }
+
+  public function authenticate(Request $request)
+  {
+      $credentials = $request->validate([
+          'email' => 'required|email',
+          'password' => 'required|string|min:6',
+      ]);
+
+      if (Auth::attempt($credentials)) {
+          $user = Auth::user();
+          $name= $user->username;
+          
+          $user->generateTwoFactorCode();
+          Mail::to($user->email)->send(new TwoFactorMail($user->two_factor_code));
+          return redirect()->route('auth.two-factor');
+      }
+
+      return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
   }
 }

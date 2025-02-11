@@ -15,6 +15,7 @@ use App\Http\Controllers\pages\MiscUnderMaintenance;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\authentications\ForgotPasswordBasic;
+use App\Http\Controllers\authentications\TwoFactorController;
 use App\Http\Controllers\cards\CardBasic;
 use App\Http\Controllers\user_interface\Accordion;
 use App\Http\Controllers\user_interface\Alerts;
@@ -43,6 +44,8 @@ use App\Http\Controllers\form_elements\InputGroups;
 use App\Http\Controllers\form_layouts\VerticalForm;
 use App\Http\Controllers\form_layouts\HorizontalForm;
 use App\Http\Controllers\tables\Basic as TablesBasic;
+
+
 
 // Main Page Route
 Route::get('/', [Analytics::class, 'index'])
@@ -127,3 +130,12 @@ Route::get('/destroy', [LoginBasic::class, 'delete'])->name('destroy');
 
 //send mail
 // Route::get('/sendmail', [RegisterBasic::class, 'sendmail'])->name('sendmail');
+
+//emails
+Route::post('/auth/login', [LoginBasic::class, 'authenticate'])->name('auth-login');
+Route::get('/auth/two-factor', [TwoFactorController::class, 'show'])->name('auth.two-factor');
+Route::post('/auth/two-factor/verify', [TwoFactorController::class, 'verify'])->name('auth.two-factor.verify');
+Route::get('/auth/otp', [TwoFactorController::class, 'otp'])->name('auth-otp');
+
+
+Route::post('/send-otp', [RegisterBasic::class, 'sendOtp'])->name('send-otp');
