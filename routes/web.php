@@ -44,6 +44,8 @@ use App\Http\Controllers\form_elements\InputGroups;
 use App\Http\Controllers\form_layouts\VerticalForm;
 use App\Http\Controllers\form_layouts\HorizontalForm;
 use App\Http\Controllers\tables\Basic as TablesBasic;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 
 
@@ -139,3 +141,11 @@ Route::get('/auth/otp', [TwoFactorController::class, 'otp'])->name('auth-otp');
 
 
 Route::post('/send-otp', [RegisterBasic::class, 'sendOtp'])->name('send-otp');
+
+// Forgot Password Routes
+Route::get('/auth/forgot-password-basic', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/auth/forgot-password-basic', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// OTP Verification Routes
+Route::get('/password/reset/otp', [ResetPasswordController::class, 'showOtpForm'])->name('password.reset.otp.form');
+Route::post('/password/reset/otp', [ResetPasswordController::class, 'resetPasswordWithOtp'])->name('password.reset.otp');
