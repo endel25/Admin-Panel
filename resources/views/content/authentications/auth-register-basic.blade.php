@@ -5,6 +5,8 @@
 @section('page-style')
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}">
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
 @endsection
 
 @section('content')
@@ -95,9 +97,7 @@
                             <button class="btn btn-primary d-grid w-100" type="submit" id="registerButton" disabled>
                                 Sign up
                             </button>
-                        </form>
-
-                        <p class="text-center">
+                        </form>... <p class="text-center">
                             <span>Already have an account?</span>
                             <a href="{{ url('auth/login-basic') }}">
                                 <span>Sign in instead</span>
@@ -115,6 +115,8 @@
 
     @push('scripts')  <!-- Use push to include scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Include SweetAlert JS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
         <script>
             $(document).ready(function() {
                 $('#sendOtp').click(function() {
@@ -138,7 +140,14 @@
                             if (response.success) {
                                 $('#otp').prop('disabled', false);
                                 $('#registerButton').prop('disabled', false);
-                                alert(response.message); // Display success message (optional)
+                                // Use SweetAlert for success message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'OTP Sent Successfully!',
+                                    text: response.message, // Use the message from the backend
+                                    showConfirmButton: false,
+                                    timer: 2000 // Auto close after 2 seconds
+                                });
                             } else {
                                 $('#email-error').text(response.message); // Display error message
                             }
