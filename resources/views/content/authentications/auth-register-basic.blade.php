@@ -29,20 +29,35 @@
                         <form id="formAuthentication" class="mb-3" action="{{ route('form-data-store') }}" method="post">
                             @csrf
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" autofocus>
+                                <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" placeholder="Enter your username" autofocus value="{{ old('username') }}">
                                 <label for="username">Username</label>
+                                @error('username')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                             <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email">
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="Enter your email" value="{{ old('email') }}">
                                 <label for="email">Email</label>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                                 <div id="email-error" class="text-danger"></div>  <!-- Error message for email -->
                             </div>
 
                             <!-- OTP Section -->
                             <div class="mb-3 d-flex align-items-center">
                                 <div class="form-floating form-floating-outline flex-grow-1">
-                                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP" maxlength="6" disabled>
+                                    <input type="text" class="form-control @error('otp') is-invalid @enderror" id="otp" name="otp" placeholder="Enter OTP" maxlength="6" disabled value="{{ old('otp') }}">
                                     <label for="otp">OTP</label>
+                                    @error('otp')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                                 <button type="button" class="btn btn-outline-primary ms-2" id="sendOtp">Send OTP</button>
                             </div>
@@ -51,8 +66,13 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="input-group input-group-merge">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
+                                        <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
                                         <label for="password">Password</label>
+                                        @error('password')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
                                 </div>
@@ -60,11 +80,16 @@
 
                             <div class="mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms">
+                                    <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" id="terms-conditions" name="terms">
                                     <label class="form-check-label" for="terms-conditions">
                                         I agree to
                                         <a href="javascript:void(0);">privacy policy & terms</a>
                                     </label>
+                                    @error('terms')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <button class="btn btn-primary d-grid w-100" type="submit" id="registerButton" disabled>
@@ -96,6 +121,11 @@
                     var email = $('#email').val();
                     $('#email-error').text(''); // Clear previous errors
 
+                    if (!email) {
+                        $('#email-error').text('Email is required.');
+                        return;
+                    }
+
                     $.ajax({
                         url: "{{ route('send-otp') }}", // Ensure this route is defined
                         type: "POST",
@@ -118,6 +148,59 @@
                             $('#email-error').text('An error occurred. Please try again.');
                         }
                     });
+                });
+
+                // Form validation before submit
+                $('#formAuthentication').submit(function(e) {
+                    var isValid = true;
+
+                    // Username validation
+                    var username = $('#username').val();
+                    if (!username) {
+                        $('#username').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#username').removeClass('is-invalid');
+                    }
+
+                    // Email validation (You might want to use a regex for more robust validation)
+                    var email = $('#email').val();
+                    if (!email) {
+                        $('#email').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#email').removeClass('is-invalid');
+                    }
+
+                    // OTP Validation
+                    var otp = $('#otp').val();
+                    if (!otp) {
+                        $('#otp').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#otp').removeClass('is-invalid');
+                    }
+
+                    // Password validation
+                    var password = $('#password').val();
+                    if (!password) {
+                        $('#password').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#password').removeClass('is-invalid');
+                    }
+
+                    // Terms validation
+                    if (!$('#terms-conditions').is(':checked')) {
+                        $('#terms-conditions').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#terms-conditions').removeClass('is-invalid');
+                    }
+
+                    if (!isValid) {
+                        e.preventDefault(); // Prevent form submission if validation fails
+                    }
                 });
             });
         </script>
