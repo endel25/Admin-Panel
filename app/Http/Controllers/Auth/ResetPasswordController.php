@@ -58,4 +58,5 @@ class ResetPasswordController extends Controller
 
         return redirect('/auth/login-basic')->with('status', 'Your password has been reset!');
     }
-}
+
+  }

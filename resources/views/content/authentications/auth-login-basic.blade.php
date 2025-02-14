@@ -29,6 +29,11 @@
           <h4 class="mb-2">Welcome to {{config('variables.templateName')}}! 👋</h4>
           <p class="mb-4">Please sign-in to your account and start the adventure</p>
 
+          @if(session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+          @endif
           @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -106,8 +111,8 @@
             };
 
             // Display success message from session
-            @if(session('success'))
-                toastr.success("{{ session('success') }}");
+            @if(session('status'))
+                toastr.success("{{ session('status') }}");
             @endif
         });
     </script>
