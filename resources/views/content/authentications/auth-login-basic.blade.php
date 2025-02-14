@@ -12,6 +12,8 @@
   <div class="authentication-wrapper authentication-basic container-p-y">
     <div class="authentication-inner py-4">
 
+
+
       <!-- Login -->
       <div class="card p-2">
         <!-- Logo -->
@@ -26,6 +28,12 @@
         <div class="card-body mt-2">
           <h4 class="mb-2">Welcome to {{config('variables.templateName')}}! 👋</h4>
           <p class="mb-4">Please sign-in to your account and start the adventure</p>
+
+          @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+          @endif
 
           <form id="formAuthentication" class="mb-3" action="{{route('form-data-fetch')}}" method="post" enctype="multipart/form-data">
             @csrf
@@ -85,4 +93,22 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            // Initialize Toastr options
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right"
+            };
+
+            // Display success message from session
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+        });
+    </script>
 @endsection

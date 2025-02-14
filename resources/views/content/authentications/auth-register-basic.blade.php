@@ -97,7 +97,7 @@
                             <button class="btn btn-primary d-grid w-100" type="submit" id="registerButton" disabled>
                                 Sign up
                             </button>
-                        </form>... <p class="text-center">
+                        </form><p class="text-center">
                             <span>Already have an account?</span>
                             <a href="{{ url('auth/login-basic') }}">
                                 <span>Sign in instead</span>
@@ -212,6 +212,39 @@
                     }
                 });
             });
+
+
+
+            $(document).ready(function() {
+            const otpInput = $('#otp');
+            const verifyBtn = $('#verifyBtn');
+            const otpForm = $('#otpForm');
+
+            // Initialize Toastr options
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right"
+            };
+
+            function validateOTP() {
+                const otpValue = otpInput.val().trim();
+                const isValidOTP = /^\d{6}$/.test(otpValue);
+                verifyBtn.prop('disabled', !isValidOTP);
+            }
+
+            otpInput.on('input', validateOTP);
+            validateOTP();
+
+            otpForm.on('submit', function(e) {
+                const otpValue = otpInput.val().trim();
+                if (!/^\d{6}$/.test(otpValue)) {
+                    e.preventDefault();
+                    toastr.error("Please enter a valid 6-digit OTP.");
+                }
+            });
+        });
+
         </script>
     @endpush
 @endsection
