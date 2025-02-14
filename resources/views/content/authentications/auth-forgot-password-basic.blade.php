@@ -43,7 +43,7 @@
                                 </span>
                             @enderror
                         </div>
-                        <button class="btn btn-primary d-grid w-100">Send OTP</button>
+                        <button id="sendOtpButton" class="btn btn-primary d-grid w-100" disabled>Send OTP</button>
                     </form>
 
                     <div class="text-center">
@@ -61,4 +61,20 @@
         </div>
     </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const emailInput = document.getElementById('email');
+      const sendOtpButton = document.getElementById('sendOtpButton');
+
+      emailInput.addEventListener('input', function() {
+          // Regular expression for validating an email
+          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailPattern.test(emailInput.value)) {
+              sendOtpButton.disabled = false; // Enable button if valid email
+          } else {
+              sendOtpButton.disabled = true; // Disable button if invalid email
+          }
+      });
+  });
+</script>
 @endsection
