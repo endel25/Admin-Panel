@@ -76,7 +76,7 @@
                                             </span>
                                         @enderror
                                     </div>
-                                    <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
+                                    {{-- <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span> --}}
                                 </div>
                             </div>
 
