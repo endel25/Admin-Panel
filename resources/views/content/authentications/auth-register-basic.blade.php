@@ -7,6 +7,35 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}">
     <!-- Include SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+    <style>
+        /* Styles for the loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Make sure it's on top */
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -25,7 +54,7 @@
                     </div>
                     <!-- /Logo -->
                     <div class="card-body mt-2">
-                        <h4 class="mb-2">Adventure starts here 🚀</h4>
+                        <h4 class="mb-2">Adventure starts here !!!!!</h4>
                         <p class="mb-4">Make your app management easy and fun!</p>
 
                         <form id="formAuthentication" class="mb-3" action="{{ route('form-data-store') }}" method="post">
@@ -113,13 +142,32 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
     @push('scripts')  <!-- Use push to include scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <!-- Include SweetAlert JS -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
         <script>
             $(document).ready(function() {
+                let lastOtpSentTime = null; // Store the last time OTP was sent
+
                 $('#sendOtp').click(function() {
+                    const now = new Date();
+
+                    if (lastOtpSentTime && (now - lastOtpSentTime) < 60000) { // 60000 ms = 1 minute
+                        const timeLeft = 60 - Math.floor((now - lastOtpSentTime) / 1000);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Too Many Requests',
+                            text: `Please wait ${timeLeft} seconds before sending another OTP.`,
+                        });
+                        return; // Exit if less than 1 minute since last OTP
+                    }
+
                     var email = $('#email').val();
                     $('#email-error').text(''); // Clear previous errors
 
@@ -127,6 +175,10 @@
                         $('#email-error').text('Email is required.');
                         return;
                     }
+
+                    // Show loading overlay
+                    $('#loadingOverlay').show();
+                    $('#sendOtp').prop('disabled', true); // Disable the button
 
                     $.ajax({
                         url: "{{ route('send-otp') }}", // Ensure this route is defined
@@ -137,6 +189,10 @@
                         },
                         dataType: 'json',
                         success: function(response) {
+                            // Hide loading overlay on success
+                            $('#loadingOverlay').hide();
+                            $('#sendOtp').prop('disabled', false); // Enable the button
+
                             if (response.success) {
                                 $('#otp').prop('disabled', false);
                                 $('#registerButton').prop('disabled', false);
@@ -148,11 +204,16 @@
                                     showConfirmButton: false,
                                     timer: 2000 // Auto close after 2 seconds
                                 });
+                                lastOtpSentTime = now; // Update last OTP sent time
                             } else {
                                 $('#email-error').text(response.message); // Display error message
                             }
                         },
                         error: function(xhr, status, error) {
+                            // Hide loading overlay on error
+                            $('#loadingOverlay').hide();
+                            $('#sendOtp').prop('disabled', false); // Enable the button
+
                             console.error(xhr.responseText);
                             $('#email-error').text('An error occurred. Please try again.');
                         }
@@ -210,40 +271,67 @@
                     if (!isValid) {
                         e.preventDefault(); // Prevent form submission if validation fails
                     }
+
+                    // Show loading overlay *before* submitting the form
+                    $('#loadingOverlay').show();
+
+                    // The form will submit normally after this, but we need to handle the
+                    // completion (success or error) to hide the loading overlay.
+                    // We'll do this with a global AJAX handler (see below).
                 });
             });
 
-
-
             $(document).ready(function() {
-            const otpInput = $('#otp');
-            const verifyBtn = $('#verifyBtn');
-            const otpForm = $('#otpForm');
+                const otpInput = $('#otp');
+                const verifyBtn = $('#verifyBtn');
+                const otpForm = $('#otpForm');
 
-            // Initialize Toastr options
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-top-right"
-            };
+                // Initialize Toastr options
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right"
+                };
 
-            function validateOTP() {
-                const otpValue = otpInput.val().trim();
-                const isValidOTP = /^\d{6}$/.test(otpValue);
-                verifyBtn.prop('disabled', !isValidOTP);
-            }
-
-            otpInput.on('input', validateOTP);
-            validateOTP();
-
-            otpForm.on('submit', function(e) {
-                const otpValue = otpInput.val().trim();
-                if (!/^\d{6}$/.test(otpValue)) {
-                    e.preventDefault();
-                    toastr.error("Please enter a valid 6-digit OTP.");
+                function validateOTP() {
+                    const otpValue = otpInput.val().trim();
+                    const isValidOTP = /^\d{6}$/.test(otpValue);
+                    verifyBtn.prop('disabled', !isValidOTP);
                 }
+
+                otpInput.on('input', validateOTP);
+                validateOTP();
+
+                otpForm.on('submit', function(e) {
+                    const otpValue = otpInput.val().trim();
+                    if (!/^\d{6}$/.test(otpValue)) {
+                        e.preventDefault();
+                        toastr.error("Please enter a valid 6-digit OTP.");
+                    }
+                });
             });
-        });
+
+            // Global AJAX complete handler to hide loading overlay after *any* AJAX call finishes
+            $(document).ajaxComplete(function() {
+                $('#loadingOverlay').hide();
+            });
+
+            // Global AJAX error handler (optional, but good to have)
+            $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+                // Log the error (optional)
+                console.error("AJAX Error:", settings.url, thrownError);
+
+                // Optionally display an error message to the user
+                // (e.g., using SweetAlert or Toastr)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sign-up Failed',
+                    text: 'An error occurred during sign-up. Please try again.',
+                });
+
+                // Ensure the loading overlay is hidden
+                $('#loadingOverlay').hide();
+            });
 
         </script>
     @endpush
