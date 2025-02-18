@@ -19,16 +19,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column; /*  Stack the spinner and message vertically */
             z-index: 1000; /* Make sure it's on top */
+            color: #333; /* Adjust text color as needed */
         }
 
         .loading-spinner {
-            border: 5px solid #f3f3f3; /* Light grey */
-            border-top: 5px solid #3498db; /* Blue */
+          border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
+            width: 60px; /* Increased size for better visibility */
+            height: 60px; /* Increased size for better visibility */
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px; /* Space between loader and text */
         }
 
         @keyframes spin {
@@ -108,7 +111,6 @@
                                     {{-- <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span> --}}
                                 </div>
                             </div>
-
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" id="terms-conditions" name="terms">
@@ -126,7 +128,8 @@
                             <button class="btn btn-primary d-grid w-100" type="submit" id="registerButton" disabled>
                                 Sign up
                             </button>
-                        </form><p class="text-center">
+                        </form>
+                        <p class="text-center">
                             <span>Already have an account?</span>
                             <a href="{{ url('auth/login-basic') }}">
                                 <span>Sign in instead</span>
@@ -145,9 +148,11 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay" style="display: none;">
         <div class="loading-spinner"></div>
+        <p id="loadingMessage">Signing up, please wait...</p> <!-- Added loading message -->
     </div>
 
-    @push('scripts')  <!-- Use push to include scripts -->
+    @push('scripts')
+        <!-- Use push to include scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <!-- Include SweetAlert JS -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
@@ -179,6 +184,9 @@
                     // Show loading overlay
                     $('#loadingOverlay').show();
                     $('#sendOtp').prop('disabled', true); // Disable the button
+
+                    // Change the loading message for sending OTP
+                    $('#loadingMessage').text('Sending OTP, please wait...');
 
                     $.ajax({
                         url: "{{ route('send-otp') }}", // Ensure this route is defined
@@ -275,6 +283,9 @@
                     // Show loading overlay *before* submitting the form
                     $('#loadingOverlay').show();
 
+                    // Change the loading message for signing up
+                    $('#loadingMessage').text('Signing up, please wait...');
+
                     // The form will submit normally after this, but we need to handle the
                     // completion (success or error) to hide the loading overlay.
                     // We'll do this with a global AJAX handler (see below).
@@ -332,7 +343,6 @@
                 // Ensure the loading overlay is hidden
                 $('#loadingOverlay').hide();
             });
-
         </script>
     @endpush
 @endsection
